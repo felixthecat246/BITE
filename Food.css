@@ -1,0 +1,51 @@
+/* CSS for the food delivery app checkout */
+
+
+
+/* Container styles */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Item styles */
+  .item {
+    margin-bottom: 10px;
+  }
+  
+  .item label {
+    display: inline-block;
+    width: 120px;
+    font-weight: bold;
+  }
+  
+  .item input {
+    width: 50px;
+  }
+  
+  /* Checkout button styles */
+  .checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .checkout-btn:hover {
+    background-color: black;
+  }
+  
+  /* Total amount styles */
+  .total-amount {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  
