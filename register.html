@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Food Delivery App - Register</title>
+    <style>
+        /* CSS code here */
+        body {
+            background-color: #333333;
+            color: white;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .form {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form input {
+            width: 300px;
+            height: 30px;
+            margin-bottom: 10px;
+        }
+
+        .form button {
+            width: 100px;
+            height: 30px;
+            margin-top: 10px;
+        }
+
+        .password-error {
+            color: whitesmoke;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <div class="form">
+            <input type="text" id="firstName" placeholder="First Name">
+            <input type="text" id="lastName" placeholder="Last Name">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <span id="passwordError" class="password-error"></span>
+            <button onclick="register()">Register</button>
+        </div>
+    </div>
+
+    <script>
+        function register() {
+            const firstNameInput = document.getElementById("firstName");
+            const lastNameInput = document.getElementById("lastName");
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+            const passwordError = document.getElementById("passwordError");
+
+            const firstName = firstNameInput.value;
+            const lastName = lastNameInput.value;
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            // Password security requirements
+            const minPasswordLength = 8;
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+            // Validate password
+            if (password.length < minPasswordLength) {
+                passwordError.textContent = `Password should be at least ${minPasswordLength} characters long`;
+                return;
+            } else if (!password.match(passwordRegex)) {
+                passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, and one digit";
+                return;
+            }
+
+            // Password is valid, clear error message
+            passwordError.textContent = "";
+
+            // Perform registration logic or send data to server
+            console.log("First Name:", firstName);
+            console.log("Last Name:", lastName);
+            console.log("Username:", username);
+            console.log("Password:", password);
+            const userData = {
+                firstName: firstName,
+                lastName: lastName,
+                username: username,
+                password: password
+            };
+
+            localStorage.setItem("userData", JSON.stringify(userData));
+
+            // Optional: Redirect to login page after successful registration
+            alert("Registration successful! Redirecting to login page...");
+            window.location.href = "loginpage.html";
+        }
+    </script>
+</body>
+
+</html>

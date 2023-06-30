@@ -1,4 +1,4 @@
-public Transaction
+public class Transaction
 
 {
     private String name;
