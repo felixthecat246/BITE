@@ -88,19 +88,9 @@
             // Password is valid, clear error message
             passwordError.textContent = "";
 
-            // Perform registration logic or send data to server
-            console.log("First Name:", firstName);
-            console.log("Last Name:", lastName);
-            console.log("Username:", username);
-            console.log("Password:", password);
-            const userData = {
-                firstName: firstName,
-                lastName: lastName,
-                username: username,
-                password: password
-            };
-
-            localStorage.setItem("userData", JSON.stringify(userData));
+            // Store the username and password in local storage
+            localStorage.setItem("username", username);
+            localStorage.setItem("password", password);
 
             // Optional: Redirect to login page after successful registration
             alert("Registration successful! Redirecting to login page...");

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
-  <title>Restaurant Name</title>
+  <title>Restaurant Search with Directions</title>
   <style>
     /* CSS code here */
     body {
@@ -25,18 +26,36 @@
       padding: 20px;
     }
 
-    .menu-item {
+    .search-container {
       margin-bottom: 20px;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .search-results {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .search-results li {
+      margin-bottom: 10px;
+    }
+
+    .search-results li button {
+      padding: 5px 10px;
+      font-size: 14px;
+      background-color: #f2f2f2;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-    }
-
-    .menu-item h3 {
-      margin: 0;
-    }
-
-    .menu-item p {
-      margin: 0;
-      color: #888;
     }
 
     .footer {
@@ -47,37 +66,23 @@
     }
   </style>
 </head>
+
 <body>
   <div class="header">
     <div class="logo">
       <img src="bitelogo.jpg" alt="Restaurant Logo">
     </div>
-    <h1>Restaurant Name</h1>
+    <h1>Restaurant Search with Directions</h1>
   </div>
 
   <div class="content">
-    <h2>Menu</h2>
+    <h2>Search for a Restaurant</h2>
 
-    <a href="#" class="menu-item" onclick="handleMenuItemClick(1)">
-      <h3>Item 1</h3>
-      <p>Description of Item 1</p>
-      <p>Price: $10.99</p>
-    </a>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Enter a restaurant name...">
+    </div>
 
-    <a href="#" class="menu-item" onclick="handleMenuItemClick(2)">
-      <h3>Item 2</h3>
-      <p>Description of Item 2</p>
-      <p>Price: $8.99</p>
-    </a>
-
-    <a href="#" class="menu-item" onclick="handleMenuItemClick(3)">
-      <h3>Item 3</h3>
-      <p>Description of Item 3</p>
-      <p>Price: $12.99</p>
-    </a>
-
-    <!-- Add more menu items as needed -->
-
+    <ul class="search-results" id="searchResults"></ul>
   </div>
 
   <div class="footer">
@@ -85,25 +90,140 @@
   </div>
 
   <script>
-    function handleMenuItemClick(itemNumber) {
-      // Perform actions based on the selected menu item
-      switch (itemNumber) {
-        case 1:
-          // Code for item 1
-          console.log("Clicked on Item 1");
-          break;
-        case 2:
-          // Code for item 2
-          console.log("Clicked on Item 2");
-          break;
-        case 3:
-          // Code for item 3
-          console.log("Clicked on Item 3");
-          break;
-        default:
-          break;
-      }
+    function initializeAutocomplete() {
+      const searchInput = document.getElementById('searchInput');
+      const searchResults = document.getElementById('searchResults');
+
+      const autocomplete = new google.maps.places.Autocomplete(searchInput, {
+        types: ['restaurant']
+      });
+      autocomplete.setFields(['place_id', 'name']);
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (!place.place_id || !place.name) return;
+
+        handleRestaurantClick(place.place_id, place.name);
+      });
+
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        if (!query) {
+          searchResults.innerHTML = '';
+          return;
+        }
+
+        const service = new google.maps.places.AutocompleteService();
+        service.getPlacePredictions(
+          { input: query, types: ['restaurant'] },
+          (predictions, status) => {
+            if (status !== google.maps.places.PlacesServiceStatus.OK) {
+              searchResults.innerHTML = '';
+              return;
+            }
+
+            const resultsHtml = predictions
+              .map(
+                prediction => `
+                  <li>
+                    ${prediction.description}
+                    <button onclick="handleRestaurantClick('${prediction.place_id}', '${prediction.description}')">
+                      Get Directions
+                    </button>
+                  </li>
+                `
+              )
+              .join('');
+
+            searchResults.innerHTML = resultsHtml;
+          }
+        );
+      });
+    }
+
+    function handleRestaurantClick(placeId, name) {
+      console.log('Clicked on restaurant:', name, 'Place ID:', placeId);
+
+      // Get the user's current location
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          // Get the destination location from the selected restaurant's place ID
+          const service = new google.maps.places.PlacesService(document.createElement('div'));
+          service.getDetails({ placeId }, (place, status) => {
+            if (status !== google.maps.places.PlacesServiceStatus.OK) {
+              console.log('Failed to retrieve restaurant details:', status);
+              return;
+            }
+
+            const destinationLocation = place.geometry.location;
+
+            // Get the distance and duration between the user's location and the destination
+            const distanceService = new google.maps.DistanceMatrixService();
+            distanceService.getDistanceMatrix(
+              {
+                origins: [userLocation],
+                destinations: [destinationLocation],
+                travelMode: google.maps.TravelMode.DRIVING
+              },
+              (response, status) => {
+                if (status !== google.maps.DistanceMatrixStatus.OK) {
+                  console.log('Failed to calculate distance:', status);
+                  return;
+                }
+
+                const distance = response.rows[0].elements[0].distance.text;
+                const duration = response.rows[0].elements[0].duration.text;
+
+                console.log('Distance:', distance);
+                console.log('Duration:', duration);
+
+                // Get the directions from the user's location to the destination
+                const directionsService = new google.maps.DirectionsService();
+                const directionsDisplay = new google.maps.DirectionsRenderer();
+
+                directionsDisplay.setMap(new google.maps.Map(document.createElement('div')));
+
+                directionsService.route(
+                  {
+                    origin: userLocation,
+                    destination: destinationLocation,
+                    travelMode: google.maps.TravelMode.DRIVING
+                  },
+                  (result, status) => {
+                    if (status !== google.maps.DirectionsStatus.OK) {
+                      console.log('Failed to calculate directions:', status);
+                      return;
+                    }
+
+                    directionsDisplay.setDirections(result);
+
+                    const steps = result.routes[0].legs[0].steps.map(step => step.instructions);
+                    console.log('Directions:', steps);
+                  }
+                );
+              }
+            );
+          });
+        },
+        error => {
+          console.log('Failed to retrieve user location:', error);
+        }
+      );
     }
   </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQYFA-8Oj-ZwMEGc-DtavFgpZEVGNEpVw&libraries=places&callback=initializeAutocomplete"
+    async defer></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAK0o4Qus-peCkBHZJtHqNhoC0UOgUBojA&libraries=distance&callback=initializeDistanceMatrix"
+    async defer></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA79JgedcjJ4XUs9SXEv4_mlZkc4eucwiI&libraries=directions&callback=initializeDirections"
+    async defer></script>
 </body>
+
 </html>

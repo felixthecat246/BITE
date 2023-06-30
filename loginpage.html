@@ -9,7 +9,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
 
     .background {
-      background: linear-gradient(to bottom, #333333, #666666, #f2f2f2);
+      background: linear-gradient(to top, black, black, blue);
     }
 
     .container {
@@ -18,7 +18,7 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background: linear-gradient(to bottom, blue, black, black);
+      background: linear-gradient(to , rgb(0, 0, 158), black, black);
     }
 
     .logo img {
@@ -38,7 +38,7 @@
       margin-bottom: 10px;
       border: none;
       border-radius: 15px;
-      background-color: rgba(10, 7, 143, 0.5);
+      background-color: rgba(4, 0, 255, 0.5);
       /* Adjust the transparency here */
       padding: 5px 10px;
       font-family: 'Space Grotesk', sans-serif;
@@ -91,11 +91,6 @@
       margin-top: 10px;
       font-family: 'Space Grotesk', sans-serif;
     }
-
-    .night-image {
-      width: 500px;
-      margin-top: 50px;
-    }
   </style>
 </head>
 
@@ -113,37 +108,32 @@
           <button onclick="redirectToRegister()" class="register-link">Register</button>
         </div>
       </div>
-      <img src="night_buildings_cartoon.jpg" alt="Nighttime Buildings" class="night-image">
     </div>
   </div>
 
   <script>
     function login() {
-      document.getElementById('loginForm').addEventListener('submit', function (event) {
-        event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+      // Retrieve the registration data from local storage
+      const registeredUsername = localStorage.getItem('username');
+      const registeredPassword = localStorage.getItem('password');
 
-        // Retrieve the registration data from local storage
-        const registeredUsername = localStorage.getItem('username');
-        const registeredPassword = localStorage.getItem('password');
-
-        if (username === registeredUsername && password === registeredPassword) {
-          alert('Login successful! Redirecting to the dashboard...');
-          // Redirect to the dashboard or perform further actions
-          window.location.href = 'dashboard.html';
-        } else {
-          alert('Invalid username or password. Please try again.');
-          // Clear the input fields
-          document.getElementById('username').value = '';
-          document.getElementById('password').value = '';
-        }
-      });
+      if (username === registeredUsername && password === registeredPassword) {
+        alert('Login successful! Redirecting to the dashboard...');
+        // Redirect to the dashboard or perform further actions
+        window.location.href = 'dashboard.html';
+      } else {
+        alert('Invalid username or password. Please try again.');
+        // Clear the input fields
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+      }
     }
 
     function redirectToRegister() {
-      window.location.href = "register.html"; // Replace "register.html" with the actual file path
+      window.location.href = 'register.html';
     }
   </script>
 </body>
